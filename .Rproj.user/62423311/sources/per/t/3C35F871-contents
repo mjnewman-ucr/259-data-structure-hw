@@ -65,7 +65,12 @@ rs_all <- bind_rows(rs_old, rs_new)
 # Use both functions to make all artists/song lowercase and remove any extra spaces
 
 #ANSWER
-str_remove_all(rs_all$Artist, "The")
+rs_all$Artist <- str_remove_all(rs_all$Artist, "The ")
+rs_all$Song <- str_remove_all(rs_all$Song, "The ")
+rs_all$Artist <- str_replace_all(rs_all$Artist, "&", "and")
+rs_all$Song <- str_replace_all(rs_all$Song, "&", "and")
+rs_all$Song <- str_remove_all(rs_all$Song, "[:punct:]")
+rs_all$Artist <- str_remove_all(rs_all$Artist, "[:punct:]")
 
 ### Question 4 ----------
 
@@ -78,7 +83,7 @@ str_remove_all(rs_all$Artist, "The")
 # in the new rs_joined compared to the original. Use nrow to check (there should be 799 rows)
 
 #ANSWER
-
+rs_all %>% left_join()
 
 ### Question 5 ----------
 
