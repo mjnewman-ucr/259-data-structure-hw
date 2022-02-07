@@ -62,6 +62,11 @@ rs_new <- arrange(rs_new, Rank)
 
 rs_all <- bind_rows(rs_old, rs_new)
 
+#ANSWER_KEY
+rs_old <- rs_old %>% mutate(Rank = as.integer(Rank), Year = as.integer(Year), Source = "Old")
+rs_new <- rs_new %>% mutate(Source = "New")
+rs_all <- bind_rows(rs_new, rs_old)
+
 ### Question 3 ----------
 
 # The join in Q1 resulted in duplicates because of differences in how the songs and artists names were written
@@ -82,6 +87,16 @@ rs_all$Artist <- str_to_lower(rs_all$Artist, locale = "en")
 rs_all$Song <- str_to_lower(rs_all$Song, locale = "en")
 rs_all$Artist <- str_trim(rs_all$Artist, side = c("both", "left", "right"))
 rs_all$Song <- str_trim(rs_all$Song, side = c("both", "left", "right"))
+
+#ANSWER_KEY
+rs_all <- rs_all %>% mutate(Artist = str_remove_all(Artist, "The"),
+                            Artist = str_replace_all(Artist, "&", "and"),
+                            Artist = str_remove_all(Artist, "[:punct:]"),
+                            Artist = str_to_lower(str_trim(Artist)))
+rs_all <- rs_all %>% mutate(Song = str_remove_all(Song, "The"),
+                            Song = str_replace_all(Song, "&", "and"),
+                            Song = str_remove_all(Song, "[:punct:]"),
+                            Song = str_to_lower(str_trim(Song)))
 ### Question 4 ----------
 
 # Now that the data have been cleaned, split rs_all into two datasets, one for old and one for new
@@ -100,6 +115,13 @@ rs_joined <-full_join(rs_new, rs_old, by = c("Artist", "Song"), suffix = c("_New
 nrow(rs_joined)
 ##Why do I also have "Source_New" and "Source_Old"? Is that a problem?
 
+#ANSWER_KEY
+temp_new <- rs_all %>% filter(Source == "New")
+temp_old <- rs_all %>% filter(Source == "Old")
+rs_joined <- full_join(temp_old, temp_new, by = c("Artist", "Song"), suffix = c("_Old","_New"))
+nrow(rs_joined)
+
+
 ### Question 5 ----------
 
 # Let's clean up rs_joined with the following steps:
@@ -110,9 +132,13 @@ nrow(rs_joined)
 # Save those changes to rs_joined
 # You should now be able to see how each song moved up/down in rankings between the two lists
 
-#ANSWER
-rs_joined <- rs_joined %>% select(-c(Source_Old, Source_New))
-test <- filter(rs_joined, !is.na(Rank_Old))
+#ANSWER_KEY
+rs_joined <- rs_joined %>% 
+  select(-starts_with("Source")) %>% 
+  filter(!is.na(Rank_New), !is.na(Rank_Old)) %>% 
+  mutate(Rank_Change = Rank_Old - Rank_New) %>% 
+  arrange(Rank_Change)
+
 
 ### Question 6 ----------
 
