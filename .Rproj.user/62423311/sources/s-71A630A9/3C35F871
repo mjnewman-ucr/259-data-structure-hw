@@ -3,7 +3,7 @@
     "path": "~/Documents/GitHub/259-data-structure-hw/structure_homework.R",
     "project_path": "structure_homework.R",
     "type": "r_source",
-    "hash": "2746588354",
+    "hash": "0",
     "contents": "",
     "dirty": false,
     "created": 1643936558638.0,
@@ -12,8 +12,8 @@
     "properties": {
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "95,0",
-        "scrollLine": "77"
+        "cursorPosition": "107,59",
+        "scrollLine": "76"
     },
     "folds": "",
     "lastKnownWriteTime": 1644195208,
