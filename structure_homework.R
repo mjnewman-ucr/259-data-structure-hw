@@ -36,7 +36,7 @@ rs_old <- url_old %>% read_html() %>% html_nodes(xpath='/html/body/table[2]') %>
 rs_joined_orig <- full_join(rs_new, rs_old, by = c("Artist", "Song"))
 nrow(rs_joined_orig)
 #There are a lot of "extra" rows! I think it is because some artists/songs are in
-#one data set but not the other. For example, Kanye is not in the old ds
+#one data set but not the other. For example, Kanye is not in the old ds. Also, naming differences
 
 ### Question 2 ---------- 
 
@@ -52,6 +52,7 @@ rs_new <- rs_new %>% mutate(Source = "New")
 rs_old$Year <- as.numeric(rs_old$Year) 
 rs_old$Rank <- as.numeric(rs_old$Rank)
 rs_old <- rs_old %>% mutate(Source = "Old")
+rs_new <- arrange(rs_new, Rank)
 
 rs_all <- bind_rows(rs_old, rs_new)
 
@@ -65,13 +66,16 @@ rs_all <- bind_rows(rs_old, rs_new)
 # Use both functions to make all artists/song lowercase and remove any extra spaces
 
 #ANSWER
-rs_all$Artist <- str_remove_all(rs_all$Artist, "The ")
-rs_all$Song <- str_remove_all(rs_all$Song, "The ")
+rs_all$Artist <- str_remove_all(rs_all$Artist, "The")
+rs_all$Song <- str_remove_all(rs_all$Song, "The")
 rs_all$Artist <- str_replace_all(rs_all$Artist, "&", "and")
 rs_all$Song <- str_replace_all(rs_all$Song, "&", "and")
 rs_all$Song <- str_remove_all(rs_all$Song, "[:punct:]")
 rs_all$Artist <- str_remove_all(rs_all$Artist, "[:punct:]")
-
+rs_all$Artist <- str_to_lower(rs_all$Artist, locale = "en")
+rs_all$Song <- str_to_lower(rs_all$Song, locale = "en")
+rs_all$Artist <- str_trim(rs_all$Artist, side = c("both", "left", "right"))
+rs_all$Song <- str_trim(rs_all$Song, side = c("both", "left", "right"))
 ### Question 4 ----------
 
 # Now that the data have been cleaned, split rs_all into two datasets, one for old and one for new
@@ -83,7 +87,12 @@ rs_all$Artist <- str_remove_all(rs_all$Artist, "[:punct:]")
 # in the new rs_joined compared to the original. Use nrow to check (there should be 799 rows)
 
 #ANSWER
-rs_all %>% left_join()
+rs_old <- rs_all %>% filter(Source == "Old")
+rs_new <- rs_all %>% filter(Source == "New")
+full_join(rs_new, rs_old, by = c("Artist", "Song"), suffix = c("_New", "_Old"))
+rs_joined <-full_join(rs_new, rs_old, by = c("Artist", "Song"), suffix = c("_New", "_Old"))
+nrow(rs_joined)
+##Why do I also have "Source_New" and "Source_Old"? Is that a problem?
 
 ### Question 5 ----------
 
@@ -96,7 +105,8 @@ rs_all %>% left_join()
 # You should now be able to see how each song moved up/down in rankings between the two lists
 
 #ANSWER
-
+rs_joined <- rs_joined %>% select(-c(Source_Old, Source_New))
+test <- filter(rs_joined, !is.na(Rank_Old))
 
 ### Question 6 ----------
 
